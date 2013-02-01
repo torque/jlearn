@@ -51,7 +51,6 @@ decks.push(
          {source: 'ほ', target: 'ho'},
          {source: 'も', target: 'mo'},
          {source: 'よ', target: 'yo'},
-         {source: 'も', target: 'mo'},
          {source: 'ろ', target: 'ro'},
          {source: 'を', target: 'wo'}
     ]
