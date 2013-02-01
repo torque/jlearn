@@ -4,6 +4,7 @@ var CardCtrl, decks, latinise;
 decks = [];
 
 CardCtrl = function($scope, $timeout, $filter) {
+  var cardHtml;
   $scope.random = false;
   $scope.consecutiveGoodAnswers = 0;
   $scope.currentCard = null;
@@ -33,8 +34,15 @@ CardCtrl = function($scope, $timeout, $filter) {
     console.log('save');
     return localStorage.userData = $filter('json')($scope.userData);
   };
+  cardHtml = function(card) {
+    if (card.isImage) {
+      return '<img src="' + card.source + '"/>';
+    } else {
+      return '<span>' + card.source + '</span>';
+    }
+  };
   $scope.nextCard = function(index) {
-    var flip, match, nextIndex;
+    var flip, nextIndex;
     $scope.input = '';
     $scope.inputClass = '';
     $('#input').val('');
@@ -49,26 +57,29 @@ CardCtrl = function($scope, $timeout, $filter) {
         $scope.currentIndex = Math.floor(Math.random() * $scope.deck.cards.length);
       } else {
         nextIndex = $scope.currentIndex + 1;
-        $scope.currentIndex = nextIndex <= $scope.deck.cards.length - 1 ? nextIndex : 0;
+        $scope.currentIndex = nextIndex < $scope.deck.cards.length ? nextIndex : 0;
       }
     }
     if (flip) {
       $('.panel').toggleClass('flip');
       $scope.flipped = $('.panel').hasClass('flip');
-      $scope.previousCard = $scope.currentCard;
+      $scope.previousCard = $scope.currentCard || {
+        source: ''
+      };
       $scope.currentCard = $scope.deck.cards[$scope.currentIndex];
-      match = $scope.currentCard.source.match(/\.(jpg|png|jpeg|gif)/);
-      $scope.currentCard.isImage = match && match.length;
-      if ($scope.currentCard.isImage && $scope.currentCard.source.indexOf('http://cdn.rszr.co') === -1) {
-        $scope.currentCard.source = 'http://cdn.rszr.co/mod=fill&width=350&h=350&quality=50&src=' + $scope.currentCard.source;
-        console.log($scope.currentCard.source);
+      if ($scope.currentCard.source.match(/\.(jpg|png|jpeg|gif)/)) {
+        $scope.currentCard.isImage = true;
+        if ($scope.currentCard.source.indexOf('http://cdn.rszr.co') === -1) {
+          $scope.currentCard.source = 'http://cdn.rszr.co/mod=fill&width=350&h=350&quality=50&src=' + $scope.currentCard.source;
+          console.log($scope.currentCard.source);
+        }
       }
       if ($scope.flipped) {
-        $scope.frontCard = $scope.previousCard;
-        return $scope.backCard = $scope.currentCard;
+        $scope.frontCard = cardHtml($scope.previousCard);
+        return $scope.backCard = cardHtml($scope.currentCard);
       } else {
-        $scope.frontCard = $scope.currentCard;
-        return $scope.backCard = $scope.previousCard;
+        $scope.frontCard = cardHtml($scope.currentCard);
+        return $scope.backCard = cardHtml($scope.previousCard);
       }
     }
   };

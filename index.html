@@ -22,13 +22,9 @@
 
         <div id="cards_container" ng-class="cardContainerClass()">
             <div class="card box panel flip">
-                <div class="front">
-                    <span ng-show="!frontCard.isImage">{{ frontCard.source }}</span>
-                    <img ng-show="frontCard.isImage" src="{{ frontCard.source }}"/>
+                <div class="front" ng-bind-html-unsafe="frontCard">
                 </div>
-                <div class="back">
-                    <span ng-show="!backCard.isImage">{{ backCard.source }}</span>
-                    <img ng-show="backCard.isImage" src="{{ backCard.source }}"/>
+                <div class="back" ng-bind-html-unsafe="backCard">
                 </div>
             </div>
             <div class="card box {{inputClass}}">

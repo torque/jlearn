@@ -31,6 +31,9 @@ CardCtrl = ($scope, $timeout, $filter) ->
 		console.log 'save'
 		localStorage.userData = $filter('json')($scope.userData)
 
+	cardHtml = (card) ->
+		return if card.isImage then '<img src="'+card.source+'"/>' else '<span>'+card.source+'</span>'
+
 	$scope.nextCard = (index) ->
 		$scope.input = ''
 		$scope.inputClass = ''
@@ -48,26 +51,26 @@ CardCtrl = ($scope, $timeout, $filter) ->
 				 $scope.currentIndex = Math.floor Math.random() * $scope.deck.cards.length
 			else
 				nextIndex = $scope.currentIndex + 1
-				$scope.currentIndex = if nextIndex <= $scope.deck.cards.length - 1 then nextIndex else 0
+				$scope.currentIndex = if nextIndex < $scope.deck.cards.length then nextIndex else 0
 
 		if flip
 			$('.panel').toggleClass 'flip'
 			$scope.flipped = $('.panel').hasClass 'flip'
-			$scope.previousCard = $scope.currentCard
+			$scope.previousCard = $scope.currentCard or {source: ''}
 			$scope.currentCard = $scope.deck.cards[$scope.currentIndex]
 
-			match = $scope.currentCard.source.match /\.(jpg|png|jpeg|gif)/
-			$scope.currentCard.isImage = match && match.length
-			if $scope.currentCard.isImage and $scope.currentCard.source.indexOf('http://cdn.rszr.co') is -1
-				$scope.currentCard.source = 'http://cdn.rszr.co/mod=fill&width=350&h=350&quality=50&src=' + $scope.currentCard.source
-				console.log($scope.currentCard.source)
+			if $scope.currentCard.source.match /\.(jpg|png|jpeg|gif)/
+				$scope.currentCard.isImage = true
+				if $scope.currentCard.source.indexOf('http://cdn.rszr.co') is -1
+					$scope.currentCard.source = 'http://cdn.rszr.co/mod=fill&width=350&h=350&quality=50&src=' + $scope.currentCard.source
+					console.log($scope.currentCard.source)
 
 			if $scope.flipped
-				$scope.frontCard = $scope.previousCard
-				$scope.backCard = $scope.currentCard
+				$scope.frontCard = cardHtml $scope.previousCard
+				$scope.backCard = cardHtml $scope.currentCard
 			else
-				$scope.frontCard = $scope.currentCard
-				$scope.backCard = $scope.previousCard
+				$scope.frontCard = cardHtml $scope.currentCard
+				$scope.backCard = cardHtml $scope.previousCard
 
 	$scope.answer = (event) ->
 		if event.keyCode is 32 and $scope.input.length <= 0
