@@ -142,7 +142,6 @@ decks = [];
         jlearn.consecutiveGoodAnswers = 0;
         jlearn.repeatLastCard = true;
       }
-      localStorage.cards = filter('json')(jlearn.deck.cards);
       return timeout(jlearn.nextCard, 300);
     }
   };

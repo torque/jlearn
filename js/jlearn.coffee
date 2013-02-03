@@ -123,7 +123,6 @@ decks = []
 				jlearn.currentCard.error++
 				jlearn.consecutiveGoodAnswers = 0
 				jlearn.repeatLastCard = true
-			localStorage.cards = filter('json')(jlearn.deck.cards)
 			timeout jlearn.nextCard, 300
 
 	jlearn.deckChanged = () ->
