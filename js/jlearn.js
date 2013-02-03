@@ -3,36 +3,36 @@ var CardCtrl, decks, latinise;
 
 decks = [];
 
-CardCtrl = function($scope, $timeout, $filter) {
+(CardCtrl = function(jlearn, timeout, filter) {
   var cardHtml;
-  $scope.random = false;
-  $scope.consecutiveGoodAnswers = 0;
-  $scope.currentCard = null;
-  $scope.previousCard = null;
-  $scope.flipped = false;
-  $scope.repeatLastCard = false;
-  $scope.input = '';
-  $scope.inputClass = '';
-  $scope.decks = decks;
-  $scope.deck = decks[0];
-  $scope.hint = '';
-  $scope.userData = {};
+  jlearn.random = false;
+  jlearn.consecutiveGoodAnswers = 0;
+  jlearn.currentCard = null;
+  jlearn.previousCard = null;
+  jlearn.flipped = false;
+  jlearn.repeatLastCard = false;
+  jlearn.input = '';
+  jlearn.inputClass = '';
+  jlearn.decks = decks;
+  jlearn.deck = decks[0];
+  jlearn.hint = '';
+  jlearn.userData = {};
   if (!localStorage.deckIndex) {
     localStorage.deckIndex = 0;
   }
   if (localStorage.userData) {
-    $scope.userData = $.parseJSON(localStorage.userData);
-    $scope.deck = $scope.decks[parseInt($scope.userData.deckIndex, 10)];
+    jlearn.userData = $.parseJSON(localStorage.userData);
+    jlearn.deck = jlearn.decks[parseInt(jlearn.userData.deckIndex, 10)];
   }
-  if (typeof $scope.deck.fuzzy === 'boolean') {
-    $scope.fuzzy = $scope.deck.fuzzy;
-    $scope.fuzzyEnabled = true;
+  if (typeof jlearn.deck.fuzzy === 'boolean') {
+    jlearn.fuzzy = jlearn.deck.fuzzy;
+    jlearn.fuzzyEnabled = true;
   } else {
-    $scope.fuzzyEnabled = false;
+    jlearn.fuzzyEnabled = false;
   }
-  $scope.saveAll = function() {
+  jlearn.saveAll = function() {
     console.log('save');
-    return localStorage.userData = $filter('json')($scope.userData);
+    return localStorage.userData = filter('json')(jlearn.userData);
   };
   cardHtml = function(card) {
     if (card.isImage) {
@@ -41,135 +41,135 @@ CardCtrl = function($scope, $timeout, $filter) {
       return '<span>' + card.source + '</span>';
     }
   };
-  $scope.nextCard = function(index) {
+  jlearn.nextCard = function(index) {
     var flip, nextIndex;
-    $scope.input = '';
-    $scope.inputClass = '';
+    jlearn.input = '';
+    jlearn.inputClass = '';
     $('#input').val('');
     flip = true;
-    if ($scope.repeatLastCard) {
-      $scope.repeatLastCard = false;
+    if (jlearn.repeatLastCard) {
+      jlearn.repeatLastCard = false;
       flip = false;
     } else if (typeof index !== 'undefined') {
-      $scope.currentIndex = index;
+      jlearn.currentIndex = index;
     } else {
-      if ($scope.random) {
-        $scope.currentIndex = Math.floor(Math.random() * $scope.deck.cards.length);
+      if (jlearn.random) {
+        jlearn.currentIndex = Math.floor(Math.random() * jlearn.deck.cards.length);
       } else {
-        nextIndex = $scope.currentIndex + 1;
-        $scope.currentIndex = nextIndex < $scope.deck.cards.length ? nextIndex : 0;
+        nextIndex = jlearn.currentIndex + 1;
+        jlearn.currentIndex = nextIndex < jlearn.deck.cards.length ? nextIndex : 0;
       }
     }
     if (flip) {
       $('.panel').toggleClass('flip');
-      $scope.flipped = $('.panel').hasClass('flip');
-      $scope.previousCard = $scope.currentCard || {
+      jlearn.flipped = $('.panel').hasClass('flip');
+      jlearn.previousCard = jlearn.currentCard || {
         source: ''
       };
-      $scope.currentCard = $scope.deck.cards[$scope.currentIndex];
-      if ($scope.currentCard.source.match(/\.(jpg|png|jpeg|gif)/)) {
-        $scope.currentCard.isImage = true;
-        if ($scope.currentCard.source.indexOf('http://cdn.rszr.co') === -1) {
-          $scope.currentCard.source = 'http://cdn.rszr.co/mod=fill&width=350&h=350&quality=50&src=' + $scope.currentCard.source;
-          console.log($scope.currentCard.source);
+      jlearn.currentCard = jlearn.deck.cards[jlearn.currentIndex];
+      if (jlearn.currentCard.source.match(/\.(jpg|png|jpeg|gif)/)) {
+        jlearn.currentCard.isImage = true;
+        if (jlearn.currentCard.source.indexOf('http://cdn.rszr.co') === -1) {
+          jlearn.currentCard.source = 'http://cdn.rszr.co/mod=fill&width=350&h=350&quality=50&src=' + jlearn.currentCard.source;
+          console.log(jlearn.currentCard.source);
         }
       }
-      if ($scope.flipped) {
-        $scope.frontCard = cardHtml($scope.previousCard);
-        return $scope.backCard = cardHtml($scope.currentCard);
+      if (jlearn.flipped) {
+        jlearn.frontCard = cardHtml(jlearn.previousCard);
+        return jlearn.backCard = cardHtml(jlearn.currentCard);
       } else {
-        $scope.frontCard = cardHtml($scope.currentCard);
-        return $scope.backCard = cardHtml($scope.previousCard);
+        jlearn.frontCard = cardHtml(jlearn.currentCard);
+        return jlearn.backCard = cardHtml(jlearn.previousCard);
       }
     }
   };
-  $scope.answer = function(event) {
-    if (event.keyCode === 32 && $scope.input.length <= 0) {
-      $scope.answer = {
+  jlearn.answer = function(event) {
+    if (event.keyCode === 32 && jlearn.input.length <= 0) {
+      jlearn.answer = {
         status: 'learn',
-        card: $scope.currentCard
+        card: jlearn.currentCard
       };
-      $scope.repeatLastCard = true;
-      $scope.consecutiveGoodAnswers = 0;
-      $('#input').val($scope.currentCard.target);
-      return $timeout($scope.nextCard, 700);
+      jlearn.repeatLastCard = true;
+      jlearn.consecutiveGoodAnswers = 0;
+      $('#input').val(jlearn.currentCard.target);
+      return timeout(jlearn.nextCard, 700);
     }
   };
-  $scope.check = function() {
+  jlearn.check = function() {
     var target;
-    if (!$scope.currentCard.success) {
-      $scope.currentCard.success = 0;
+    if (!jlearn.currentCard.success) {
+      jlearn.currentCard.success = 0;
     }
-    if (!$scope.currentCard.error) {
-      $scope.currentCard.error = 0;
+    if (!jlearn.currentCard.error) {
+      jlearn.currentCard.error = 0;
     }
-    target = $scope.currentCard.target.toLowerCase();
-    if ($scope.fuzzy) {
+    target = jlearn.currentCard.target.toLowerCase();
+    if (jlearn.fuzzy) {
       target = target.latinise();
     }
-    if ($scope.input.length >= 1) {
-      $scope.hint = '';
-      if (target.indexOf($scope.input.toLowerCase()) === 0) {
-        $scope.inputClass = 'ok';
+    if (jlearn.input.length >= 1) {
+      jlearn.hint = '';
+      if (target.indexOf(jlearn.input.toLowerCase()) === 0) {
+        jlearn.inputClass = 'ok';
       } else {
-        if ($scope.currentCard.hint) {
-          $scope.hint = $scope.currentCard.hint;
-        } else if ($scope.currentCard.target.length === 1) {
-          $scope.hint = "It's only one letter.";
+        if (jlearn.currentCard.hint) {
+          jlearn.hint = jlearn.currentCard.hint;
+        } else if (jlearn.currentCard.target.length === 1) {
+          jlearn.hint = "It's only one letter.";
         } else {
-          $scope.hint = 'The first letter is <b>"' + $scope.currentCard.target[0] + '"</b>';
+          jlearn.hint = 'The first letter is <strong>"' + jlearn.currentCard.target[0] + '"</strong>';
         }
-        $scope.inputClass = 'error';
+        jlearn.inputClass = 'error';
       }
     } else {
-      $scope.hint = '';
-      $scope.inputClass = '';
+      jlearn.hint = '';
+      jlearn.inputClass = '';
     }
-    if ($scope.input.length === $scope.currentCard.target.length) {
-      if ($scope.input.toLowerCase() === target) {
-        $scope.answer = {
+    if (jlearn.input.length === jlearn.currentCard.target.length) {
+      if (jlearn.input.toLowerCase() === target) {
+        jlearn.answer = {
           status: 'success',
-          card: $scope.currentCard
+          card: jlearn.currentCard
         };
-        $scope.currentCard.success++;
-        $scope.consecutiveGoodAnswers++;
+        jlearn.currentCard.success++;
+        jlearn.consecutiveGoodAnswers++;
       } else {
-        $scope.answer = {
+        jlearn.answer = {
           status: 'error',
-          card: $scope.currentCard
+          card: jlearn.currentCard
         };
-        $scope.currentCard.error++;
-        $scope.consecutiveGoodAnswers = 0;
-        $scope.repeatLastCard = true;
+        jlearn.currentCard.error++;
+        jlearn.consecutiveGoodAnswers = 0;
+        jlearn.repeatLastCard = true;
       }
-      localStorage.cards = $filter('json')($scope.deck.cards);
-      return $timeout($scope.nextCard, 300);
+      localStorage.cards = filter('json')(jlearn.deck.cards);
+      return timeout(jlearn.nextCard, 300);
     }
   };
-  $scope.deckChanged = function() {
-    if (typeof $scope.deck.fuzzy === 'boolean') {
-      $scope.fuzzy = $scope.deck.fuzzy;
-      $scope.fuzzyEnabled = true;
+  jlearn.deckChanged = function() {
+    if (typeof jlearn.deck.fuzzy === 'boolean') {
+      jlearn.fuzzy = jlearn.deck.fuzzy;
+      jlearn.fuzzyEnabled = true;
     } else {
-      $scope.fuzzyEnabled = false;
+      jlearn.fuzzyEnabled = false;
     }
-    $scope.userData.deckIndex = $scope.decks.indexOf($scope.deck);
-    $scope.saveAll();
-    $scope.nextCard();
+    jlearn.userData.deckIndex = jlearn.decks.indexOf(jlearn.deck);
+    jlearn.saveAll();
+    jlearn.nextCard();
     return $('#input').focus();
   };
-  $scope.cardContainerClass = function() {
-    if ($scope.currentCard.isImage) {
+  jlearn.cardContainerClass = function() {
+    if (jlearn.currentCard.isImage) {
       return 'image';
     }
-    if ($scope.currentCard.source.length > 3 || $scope.currentCard.target.length > 3) {
+    if (jlearn.currentCard.source.length > 3 || jlearn.currentCard.target.length > 3) {
       return 'small';
     } else {
       return 'big';
     }
   };
-  $scope.getClass = function(card) {
-    if ($scope.getStats(card) >= 50) {
+  jlearn.getClass = function(card) {
+    if (jlearn.getStats(card) >= 50) {
       return 'success';
     } else {
       if (card.success < card.error) {
@@ -179,7 +179,7 @@ CardCtrl = function($scope, $timeout, $filter) {
       }
     }
   };
-  $scope.getStats = function(card) {
+  jlearn.getStats = function(card) {
     var res;
     res = Math.floor(card.success / (card.error + card.success) * 100);
     if (isNaN(res)) {
@@ -189,9 +189,9 @@ CardCtrl = function($scope, $timeout, $filter) {
     }
   };
   $('#input').focus();
-  $('#input').keyup($.proxy($scope.answer, $scope));
-  return $scope.nextCard(!$scope.random ? 0 : void 0);
-};
+  $('#input').keyup($.proxy(jlearn.answer, jlearn));
+  return jlearn.nextCard(!jlearn.random ? 0 : void 0);
+}).$inject = ['$scope', '$timeout', '$filter'];
 
 latinise = {
   latin_map: {
