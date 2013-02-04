@@ -3,8 +3,8 @@ var CardCtrl, decks, latinise;
 
 decks = [];
 
-(CardCtrl = function(jlearn, timeout, filter) {
-  var cardHtml;
+(CardCtrl = function(jlearn, timeout) {
+  var cardHtml, userData;
   jlearn.random = false;
   jlearn.consecutiveGoodAnswers = 0;
   jlearn.currentCard = null;
@@ -16,15 +16,16 @@ decks = [];
   jlearn.decks = decks;
   jlearn.deck = decks[0];
   jlearn.hint = '';
-  jlearn.userData = {
+  userData = {
     currentIndex: []
   };
+  userData.deckIndex = 0;
   if (!localStorage.deckIndex) {
     localStorage.deckIndex = 0;
   }
   if (localStorage.userData) {
-    jlearn.userData = $.parseJSON(localStorage.userData);
-    jlearn.deck = jlearn.decks[parseInt(jlearn.userData.deckIndex, 10)];
+    userData = $.parseJSON(localStorage.userData);
+    jlearn.deck = jlearn.decks[userData.deckIndex];
   }
   if (typeof jlearn.deck.fuzzy === 'boolean') {
     jlearn.fuzzy = jlearn.deck.fuzzy;
@@ -34,7 +35,7 @@ decks = [];
   }
   jlearn.saveAll = function() {
     console.log('save');
-    return localStorage.userData = filter('json')(jlearn.userData);
+    return localStorage.userData = JSON.stringify(userData);
   };
   cardHtml = function(card) {
     if (card.isImage) {
@@ -69,7 +70,7 @@ decks = [];
         jlearn.currentIndex = nextIndex < jlearn.deck.cards.length ? nextIndex : 0;
       }
     }
-    jlearn.userData.currentIndex[jlearn.userData.deckIndex] = jlearn.currentIndex;
+    userData.currentIndex[userData.deckIndex] = jlearn.currentIndex;
     if (flip) {
       $('.panel').toggleClass('flip');
       jlearn.flipped = $('.panel').hasClass('flip');
@@ -162,9 +163,8 @@ decks = [];
     } else {
       jlearn.fuzzyEnabled = false;
     }
-    jlearn.userData.deckIndex = jlearn.decks.indexOf(jlearn.deck);
-    jlearn.saveAll();
-    jlearn.nextCard(jlearn.random ? void 0 : jlearn.userData.currentIndex[jlearn.userData.deckIndex] || 0);
+    userData.deckIndex = jlearn.decks.indexOf(jlearn.deck);
+    jlearn.nextCard(jlearn.random ? void 0 : userData.currentIndex[userData.deckIndex] || 0);
     return $('#input').focus();
   };
   jlearn.cardContainerClass = function() {
@@ -199,8 +199,11 @@ decks = [];
   };
   $('#input').focus();
   $('#input').keyup($.proxy(jlearn.answer, jlearn));
-  return jlearn.nextCard(jlearn.random ? void 0 : jlearn.userData.currentIndex[jlearn.userData.deckIndex] || 0);
-}).$inject = ['$scope', '$timeout', '$filter'];
+  jlearn.nextCard(jlearn.random ? void 0 : userData.currentIndex[userData.deckIndex] || 0);
+  return window.onunload = function() {
+    return localStorage.userData = JSON.stringify(userData);
+  };
+}).$inject = ['$scope', '$timeout'];
 
 latinise = {
   latin_map: {
