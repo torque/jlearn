@@ -1,7 +1,6 @@
 decks = []
 
 (CardCtrl = (jlearn, timeout, filter) ->
-	# todo: initialize from localStorage
 	jlearn.random = false
 	jlearn.consecutiveGoodAnswers = 0
 	jlearn.currentCard = null
@@ -15,7 +14,7 @@ decks = []
 	jlearn.decks = decks
 	jlearn.deck = decks[0]
 	jlearn.hint = ''
-	jlearn.userData = {}
+	jlearn.userData = {currentIndex: []}
 
 	localStorage.deckIndex = 0 unless localStorage.deckIndex
 	if localStorage.userData
@@ -54,6 +53,8 @@ decks = []
 				nextIndex = jlearn.currentIndex + 1
 				jlearn.currentIndex = if nextIndex < jlearn.deck.cards.length then nextIndex else 0
 
+		jlearn.userData.currentIndex[jlearn.userData.deckIndex] = jlearn.currentIndex
+		
 		if flip
 			$('.panel').toggleClass 'flip'
 			jlearn.flipped = $('.panel').hasClass 'flip'
@@ -134,7 +135,7 @@ decks = []
 
 		jlearn.userData.deckIndex = jlearn.decks.indexOf jlearn.deck
 		jlearn.saveAll()
-		jlearn.nextCard()
+		jlearn.nextCard(if jlearn.random then undefined else jlearn.userData.currentIndex[jlearn.userData.deckIndex] or 0)
 		$('#input').focus()
 
 	jlearn.cardContainerClass = () ->
@@ -151,7 +152,7 @@ decks = []
 	$('#input').focus()
 	$('#input').keyup $.proxy(jlearn.answer, jlearn)
 
-	jlearn.nextCard unless jlearn.random then 0 else undefined
+	jlearn.nextCard if jlearn.random then undefined else jlearn.userData.currentIndex[jlearn.userData.deckIndex] or 0
 
 ).$inject = ['$scope','$timeout','$filter']
 

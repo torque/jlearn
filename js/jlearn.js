@@ -16,7 +16,9 @@ decks = [];
   jlearn.decks = decks;
   jlearn.deck = decks[0];
   jlearn.hint = '';
-  jlearn.userData = {};
+  jlearn.userData = {
+    currentIndex: []
+  };
   if (!localStorage.deckIndex) {
     localStorage.deckIndex = 0;
   }
@@ -60,6 +62,7 @@ decks = [];
         jlearn.currentIndex = nextIndex < jlearn.deck.cards.length ? nextIndex : 0;
       }
     }
+    jlearn.userData.currentIndex[jlearn.userData.deckIndex] = jlearn.currentIndex;
     if (flip) {
       $('.panel').toggleClass('flip');
       jlearn.flipped = $('.panel').hasClass('flip');
@@ -154,7 +157,7 @@ decks = [];
     }
     jlearn.userData.deckIndex = jlearn.decks.indexOf(jlearn.deck);
     jlearn.saveAll();
-    jlearn.nextCard();
+    jlearn.nextCard(jlearn.random ? void 0 : jlearn.userData.currentIndex[jlearn.userData.deckIndex] || 0);
     return $('#input').focus();
   };
   jlearn.cardContainerClass = function() {
@@ -189,7 +192,7 @@ decks = [];
   };
   $('#input').focus();
   $('#input').keyup($.proxy(jlearn.answer, jlearn));
-  return jlearn.nextCard(!jlearn.random ? 0 : void 0);
+  return jlearn.nextCard(jlearn.random ? void 0 : jlearn.userData.currentIndex[jlearn.userData.deckIndex] || 0);
 }).$inject = ['$scope', '$timeout', '$filter'];
 
 latinise = {
