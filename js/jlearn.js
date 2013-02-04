@@ -20,9 +20,6 @@ decks = [];
     currentIndex: []
   };
   userData.deckIndex = 0;
-  if (!localStorage.deckIndex) {
-    localStorage.deckIndex = 0;
-  }
   if (localStorage.userData) {
     userData = $.parseJSON(localStorage.userData);
     jlearn.deck = jlearn.decks[userData.deckIndex];

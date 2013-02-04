@@ -17,7 +17,6 @@ decks = []
 	userData = {currentIndex: []}
 	userData.deckIndex = 0
 
-	localStorage.deckIndex = 0 unless localStorage.deckIndex
 	if localStorage.userData
 		userData = $.parseJSON localStorage.userData
 		jlearn.deck = jlearn.decks[userData.deckIndex]
