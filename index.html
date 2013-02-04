@@ -38,7 +38,7 @@
             <span ng-show="answer.status == 'success'">You were right!</span>
             <span ng-show="answer.status == 'error'">You were wrong!</span>
             <span ng-show="answer.status == 'learn'">Learning mode:</span>
-            Answer for <b>{{answer.card.source}}</b> was: <b>{{answer.card.target}}</b>
+            The answer for <span ng-show="answer.card.isImage">that card</span><span ng-show="!answer.card.isImage">{{answer.card.source}}</span> was: <b>{{answer.card.target}}</b>
             <div class="consecutive" ng-show="consecutiveGoodAnswers > 3">{{consecutiveGoodAnswers}} good consecutive answers!</div>
             <div ng-show="answer.status != 'success'">Time to type what you've just learnt!</div>
         </div>
@@ -49,7 +49,7 @@
                 <label ng-show="fuzzyEnabled">fuzzy match <input type="checkbox" ng-model="fuzzy"/></label>
                 <label>random order <input type="checkbox" ng-model="random"/></label>
             </div>
-            <span ng-repeat="card in deck.cards" ng-class="getClass(card)" title="{{card.target}} ({{card.success}}/{{card.error}})">{{card.source}} {{ getStats(card) }}%</span>
+            <span ng-repeat="card in deck.cards" ng-class="getClass(card)" title="{{card.target}} ({{card.success}}/{{card.error}})" ng-bind-html-unsafe="smallSpan(card)"></span>
         </div>
     </div>
 </body>

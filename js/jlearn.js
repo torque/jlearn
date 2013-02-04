@@ -43,6 +43,13 @@ decks = [];
       return '<span>' + card.source + '</span>';
     }
   };
+  jlearn.smallSpan = function(card) {
+    if (jlearn.currentCard.source.match(/\.(jpg|png|jpeg|gif)/)) {
+      return '<img src="' + card.source + '" height="50px"/>' + ' ' + jlearn.getStats(card) + '%';
+    } else {
+      return card.source + ' ' + jlearn.getStats(card) + '%';
+    }
+  };
   jlearn.nextCard = function(index) {
     var flip, nextIndex;
     jlearn.input = '';

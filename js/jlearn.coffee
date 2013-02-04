@@ -34,6 +34,12 @@ decks = []
 	cardHtml = (card) ->
 		return if card.isImage then '<img src="'+card.source+'"/>' else '<span>'+card.source+'</span>'
 
+	jlearn.smallSpan = (card) ->
+		if jlearn.currentCard.source.match /\.(jpg|png|jpeg|gif)/
+			'<img src="' + card.source + '" height="50px"/>' + ' ' + jlearn.getStats(card) + '%'
+		else
+			card.source + ' ' + jlearn.getStats(card) + '%'
+
 	jlearn.nextCard = (index) ->
 		jlearn.input = ''
 		jlearn.inputClass = ''
