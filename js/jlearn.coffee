@@ -20,6 +20,7 @@ decks = []
 	if localStorage.userData
 		userData = $.parseJSON localStorage.userData
 		jlearn.deck = jlearn.decks[userData.deckIndex]
+		jlearn.random = userData.random
 
 	if typeof(jlearn.deck.fuzzy) is 'boolean'
 		jlearn.fuzzy = jlearn.deck.fuzzy
@@ -28,7 +29,7 @@ decks = []
 		jlearn.fuzzyEnabled = false
 
 	jlearn.saveAll = () ->
-		console.log 'save'
+		userData.random = jlearn.random
 		localStorage.userData = JSON.stringify userData
 		#return null
 
@@ -161,7 +162,7 @@ decks = []
 	jlearn.nextCard if jlearn.random then undefined else userData.currentIndex[userData.deckIndex] or 0
 
 	window.onunload = () ->
-		localStorage.userData = JSON.stringify userData
+		jlearn.saveAll()
 
 ).$inject = ['$scope','$timeout']
 

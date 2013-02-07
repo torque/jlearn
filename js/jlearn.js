@@ -23,6 +23,7 @@ decks = [];
   if (localStorage.userData) {
     userData = $.parseJSON(localStorage.userData);
     jlearn.deck = jlearn.decks[userData.deckIndex];
+    jlearn.random = userData.random;
   }
   if (typeof jlearn.deck.fuzzy === 'boolean') {
     jlearn.fuzzy = jlearn.deck.fuzzy;
@@ -31,7 +32,7 @@ decks = [];
     jlearn.fuzzyEnabled = false;
   }
   jlearn.saveAll = function() {
-    console.log('save');
+    userData.random = jlearn.random;
     return localStorage.userData = JSON.stringify(userData);
   };
   cardHtml = function(card) {
@@ -198,7 +199,7 @@ decks = [];
   $('#input').keyup($.proxy(jlearn.answer, jlearn));
   jlearn.nextCard(jlearn.random ? void 0 : userData.currentIndex[userData.deckIndex] || 0);
   return window.onunload = function() {
-    return localStorage.userData = JSON.stringify(userData);
+    return jlearn.saveAll();
   };
 }).$inject = ['$scope', '$timeout'];
 
