@@ -39,7 +39,7 @@
             <span ng-show="answer.status == 'error'">You were wrong!</span>
             <span ng-show="answer.status == 'learn'">Learning mode:</span>
             The answer for <span ng-show="answer.card.isImage">that card</span><span ng-show="!answer.card.isImage">{{answer.card.source}}</span> was: <b>{{answer.card.target}}</b>
-            <div class="consecutive" ng-show="consecutiveGoodAnswers > 3">{{consecutiveGoodAnswers}} good consecutive answers!</div>
+            <div class="consecutive" ng-show="consecutiveGoodAnswers > 3">{{consecutiveGoodAnswers}} consecutive right answers!</div>
             <div ng-show="answer.status != 'success'">Time to type what you've just learnt!</div>
         </div>
         <div id="history" class="box">
