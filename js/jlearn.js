@@ -11,6 +11,7 @@ decks = [];
   jlearn.previousCard = null;
   jlearn.flipped = false;
   jlearn.repeatLastCard = false;
+  jlearn.answered = false;
   jlearn.input = '';
   jlearn.inputClass = '';
   jlearn.decks = decks;
@@ -98,60 +99,66 @@ decks = [];
         status: 'learn',
         card: jlearn.currentCard
       };
+      jlearn.answered = true;
       jlearn.repeatLastCard = true;
       jlearn.consecutiveGoodAnswers = 0;
       $('#input').val(jlearn.currentCard.target);
-      return timeout(jlearn.nextCard, 700);
+      return timeout(function() {
+        jlearn.answered = false;
+        return jlearn.nextCard();
+      }, 700);
     }
   };
   jlearn.check = function() {
     var target;
-    if (!jlearn.currentCard.success) {
-      jlearn.currentCard.success = 0;
-    }
-    if (!jlearn.currentCard.error) {
-      jlearn.currentCard.error = 0;
-    }
-    target = jlearn.currentCard.target.toLowerCase();
-    if (jlearn.fuzzy) {
-      target = target.latinise();
-    }
-    if (jlearn.input.length >= 1) {
-      jlearn.hint = '';
-      if (target.indexOf(jlearn.input.toLowerCase()) === 0) {
-        jlearn.inputClass = 'ok';
-      } else {
-        if (jlearn.currentCard.hint) {
-          jlearn.hint = jlearn.currentCard.hint;
-        } else if (jlearn.currentCard.target.length === 1) {
-          jlearn.hint = "It's only one letter.";
+    if (!jlearn.answered) {
+      if (!jlearn.currentCard.success) {
+        jlearn.currentCard.success = 0;
+      }
+      if (!jlearn.currentCard.error) {
+        jlearn.currentCard.error = 0;
+      }
+      target = jlearn.currentCard.target.toLowerCase();
+      if (jlearn.fuzzy) {
+        target = target.latinise();
+      }
+      if (jlearn.input.length >= 1) {
+        jlearn.hint = '';
+        if (target.indexOf(jlearn.input.toLowerCase()) === 0) {
+          jlearn.inputClass = 'ok';
         } else {
-          jlearn.hint = 'The first letter is <strong>"' + jlearn.currentCard.target[0] + '"</strong>';
+          if (jlearn.currentCard.hint) {
+            jlearn.hint = jlearn.currentCard.hint;
+          } else if (jlearn.currentCard.target.length === 1) {
+            jlearn.hint = "It's only one letter.";
+          } else {
+            jlearn.hint = 'The first letter is <strong>"' + jlearn.currentCard.target[0] + '"</strong>';
+          }
+          jlearn.inputClass = 'error';
         }
-        jlearn.inputClass = 'error';
-      }
-    } else {
-      jlearn.hint = '';
-      jlearn.inputClass = '';
-    }
-    if (jlearn.input.length === jlearn.currentCard.target.length) {
-      if (jlearn.input.toLowerCase() === target) {
-        jlearn.answer = {
-          status: 'success',
-          card: jlearn.currentCard
-        };
-        jlearn.currentCard.success++;
-        jlearn.consecutiveGoodAnswers++;
       } else {
-        jlearn.answer = {
-          status: 'error',
-          card: jlearn.currentCard
-        };
-        jlearn.currentCard.error++;
-        jlearn.consecutiveGoodAnswers = 0;
-        jlearn.repeatLastCard = true;
+        jlearn.hint = '';
+        jlearn.inputClass = '';
       }
-      return timeout(jlearn.nextCard, 300);
+      if (jlearn.input.length === jlearn.currentCard.target.length) {
+        if (jlearn.input.toLowerCase() === target) {
+          jlearn.answer = {
+            status: 'success',
+            card: jlearn.currentCard
+          };
+          jlearn.currentCard.success++;
+          jlearn.consecutiveGoodAnswers++;
+        } else {
+          jlearn.answer = {
+            status: 'error',
+            card: jlearn.currentCard
+          };
+          jlearn.currentCard.error++;
+          jlearn.consecutiveGoodAnswers = 0;
+          jlearn.repeatLastCard = true;
+        }
+        return timeout(jlearn.nextCard, 300);
+      }
     }
   };
   jlearn.deckChanged = function() {

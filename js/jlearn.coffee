@@ -8,6 +8,7 @@ decks = []
 
 	jlearn.flipped = false
 	jlearn.repeatLastCard = false
+	jlearn.answered = false
 	jlearn.input = ''
 	jlearn.inputClass = ''
 
@@ -88,51 +89,56 @@ decks = []
 				status: 'learn'
 				card:   jlearn.currentCard
 			}
+			jlearn.answered = true
 			jlearn.repeatLastCard = true
 			jlearn.consecutiveGoodAnswers = 0
 			$('#input').val jlearn.currentCard.target
-			timeout jlearn.nextCard, 700
+			timeout () -> 
+				jlearn.answered = false
+				jlearn.nextCard()
+			, 700
 
 	jlearn.check = () ->
-		jlearn.currentCard.success = 0 unless jlearn.currentCard.success
-		jlearn.currentCard.error = 0 unless jlearn.currentCard.error
+		unless jlearn.answered
+			jlearn.currentCard.success = 0 unless jlearn.currentCard.success
+			jlearn.currentCard.error = 0 unless jlearn.currentCard.error
 
-		target = jlearn.currentCard.target.toLowerCase()
-		target = target.latinise() if jlearn.fuzzy
+			target = jlearn.currentCard.target.toLowerCase()
+			target = target.latinise() if jlearn.fuzzy
 
-		if jlearn.input.length >= 1
-			jlearn.hint = ''
-			if target.indexOf(jlearn.input.toLowerCase()) is 0
-				jlearn.inputClass = 'ok' 
-			else
-				if jlearn.currentCard.hint
-					jlearn.hint = jlearn.currentCard.hint
-				else if jlearn.currentCard.target.length is 1
-					jlearn.hint = "It's only one letter."
+			if jlearn.input.length >= 1
+				jlearn.hint = ''
+				if target.indexOf(jlearn.input.toLowerCase()) is 0
+					jlearn.inputClass = 'ok' 
 				else
-					jlearn.hint = 'The first letter is <strong>"' + jlearn.currentCard.target[0] + '"</strong>'
-				jlearn.inputClass = 'error'
-		else
-			jlearn.hint = ''
-			jlearn.inputClass = ''
-
-		if jlearn.input.length is jlearn.currentCard.target.length
-			if jlearn.input.toLowerCase() is target
-				jlearn.answer = {
-					status: 'success'
-					card:   jlearn.currentCard
-				}
-				jlearn.currentCard.success++
-				jlearn.consecutiveGoodAnswers++
+					if jlearn.currentCard.hint
+						jlearn.hint = jlearn.currentCard.hint
+					else if jlearn.currentCard.target.length is 1
+						jlearn.hint = "It's only one letter."
+					else
+						jlearn.hint = 'The first letter is <strong>"' + jlearn.currentCard.target[0] + '"</strong>'
+					jlearn.inputClass = 'error'
 			else
-				jlearn.answer = {
-					status: 'error'
-					card:   jlearn.currentCard
-				}
-				jlearn.currentCard.error++
-				jlearn.consecutiveGoodAnswers = 0
-				jlearn.repeatLastCard = true
-			timeout jlearn.nextCard, 300
+				jlearn.hint = ''
+				jlearn.inputClass = ''
+
+			if jlearn.input.length is jlearn.currentCard.target.length
+				if jlearn.input.toLowerCase() is target
+					jlearn.answer = {
+						status: 'success'
+						card:   jlearn.currentCard
+					}
+					jlearn.currentCard.success++
+					jlearn.consecutiveGoodAnswers++
+				else
+					jlearn.answer = {
+						status: 'error'
+						card:   jlearn.currentCard
+					}
+					jlearn.currentCard.error++
+					jlearn.consecutiveGoodAnswers = 0
+					jlearn.repeatLastCard = true
+				timeout jlearn.nextCard, 300
 
 	jlearn.deckChanged = () ->
 		if typeof(jlearn.deck.fuzzy) is 'boolean'
