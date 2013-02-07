@@ -49,7 +49,7 @@
                 <label ng-show="fuzzyEnabled">fuzzy match <input type="checkbox" ng-model="fuzzy"/></label>
                 <label>random order <input type="checkbox" ng-model="random"/></label>
             </div>
-            <span ng-repeat="card in deck.cards" ng-class="getClass(card)" title="{{card.target}} ({{card.success}}/{{card.error}})" ng-bind-html-unsafe="smallSpan(card)"></span>
+            <span ng-repeat="card in deck.cards" ng-class="getClass(card)" title="{{card.target}} ({{card.success || 0}}/{{card.error || 0}})" ng-bind-html-unsafe="smallSpan(card)"></span>
         </div>
     </div>
 </body>
